@@ -13,10 +13,10 @@ class GestionRegistros():
     def gestionRegistro(self):
         self.listaFotosVisualizadas = self.manager.cicloVisor.listaArchivosCreados
         self.nInspeccionesObjetivo = self.manager.conexionPLC.valoresPLC['Num_Inspecciones_Obj']
-        self.nFotosObjetivo = self.manager.gestionModelo.infoModelo[self.nInspeccionesObjetivo]['cFotoJPG']
         self.logger.debug('Gestionando Registro ...')
         registro = self.manager.conexionPLC.valoresPLC['Datos_Registro']
         try:
+            self.nFotosObjetivo = self.manager.gestionModelo.infoModelo[self.nInspeccionesObjetivo]['cFotoJPG']
             self.logger.debug(f"Nº de inspecciones objetivo para convertir cadena {self.nInspeccionesObjetivo}")
             self.registroProcesado = self.convertirCadena(registro, self.logger, self.nInspeccionesObjetivo)
             self._imprimirRegistroEnLog()
@@ -27,10 +27,16 @@ class GestionRegistros():
             else:
                 self.logger.error('BBDD No conectada, registro no introducido')
                 self.manager.gestionBBDD.comprobarConexBBDD()
-
+        except KeyError as e:
+            self.logger.error('Error en configModelo, gestionModelo.infoModelo[self.nInspeccionesObjetivo]["cFotoJPG"]')
+            self.logger.error(f'No existe la Key:{e} en la conf.')
 
         except ValueError as e:
             self.logger.error('Error al procesar registro')
+            self.logger.error(e)
+        
+        except Exception as e:
+            self.logger.error('Error general de gestinRegistro')
             self.logger.error(e)
         
         finally:
