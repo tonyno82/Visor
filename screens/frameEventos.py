@@ -67,7 +67,7 @@ class FrameEventos(tk.Frame):
                 break
             else:
                 self._escribirPantalla(mensaje.getMessage())
-        self.after(1000, self._actualizarPantallaLog)
+        self.after(500, self._actualizarPantallaLog)
 
 
 # TODO : Añadir botones a la derecha para elegir el nivel de loggging, (debug-info-error...)
