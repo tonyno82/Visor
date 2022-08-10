@@ -69,7 +69,7 @@ class ConexPLC:
                     inicioCicloScan = time.time()
                     self.valoresPLC['Etapa_Principal'] = plc.read_by_name(".Etapa_Principal", pyads.PLCTYPE_INT)
                     self.valoresPLC['Marcha_Inspeccion'] = plc.read_by_name(".Marcha_Inspeccion")
-                    self.valoresPLC['Datos_Registro'] = plc.read_by_name(".Datos_Registro", pyads.PLCTYPE_STRING)
+                    self.valoresPLC['Datos_Registro'] = str(plc.read_by_name(".Datos_Registro", pyads.PLCTYPE_STRING))[:50]
                     self.valoresPLC['Num_Inspecciones_Obj'] = plc.read_by_name(".Num_Inspecciones_Obj", pyads.PLCTYPE_INT)
                     self.valoresPLC['Num_Inspecciones_Interno'] = self.manager.contador
                     self.valoresPLC['Pausa'] = self._comprobarPausa()
