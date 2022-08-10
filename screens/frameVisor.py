@@ -19,72 +19,67 @@ class FrameVisor(tk.Frame):
         self.listaEtapasReseteo = self.gestionModelo.listaEtapasReseteo
         self.configure(background='#121212', height=980, width=1280)
 
-        # Frames Info
-        self.frameInfo = tk.Frame(self)
-        self.frameInfo.configure(width=1280)
-        self.frameInfo.grid(row=0, column=0)
-        # self.frameInfo.grid_propagate(False)
-        self._agregarInfo()
-
-
-        # Frames Fotos
-        self.frameFotos = ttk.Frame(self)
-        self.frameFotos.configure(height= 954,width=1280)
-        self.frameFotos.grid(row=1, column=0)
-        self.frameFotos.columnconfigure(0, weight=1)
-        self.frameFotos.columnconfigure(1, weight=1)
-        self.frameFotos.rowconfigure(0, weight=1)
-        self.frameFotos.rowconfigure(1, weight=1)
-        self.frameFotos.grid_propagate(False)
-
         # Variables
         self.imagen = {}
         self.label = {}
     
-
-    
     def crearLabel(self, foto):
         """recibe una foto y inserta laber en la pantalla, actualmente en formato 2x2 y 3x3 para imagenes de 640x480"""
-        logger = self.logger
         nLed = self.manager.contador
-        nLedObjetivo = self.manager.conexionPLC.valoresPLC['Num_Inspecciones_Obj']
-        if nLedObjetivo <= 4:
-            self._reducirFoto(foto, 608, 456)
+        self.nLedObjetivo = self.manager.conexionPLC.valoresPLC['Num_Inspecciones_Obj']
+        if self.nLedObjetivo <= 4:
+            self._configura_columnas()
+            # La fotos del sensor de keyence viene a 640x480
+            self._reducirFoto(foto)
             if nLed <= 2:
                 self.logger.debug(f'if nLed <= 2 -> Contador {nLed}')
                 self.label[nLed].grid(column=nLed-1, row=0)
             else:
                 self.logger.debug(f'else: -> Contador {nLed}')
                 self.label[nLed].grid(column=nLed-3, row=1)
-        elif nLedObjetivo <= 8:
-            self._reducirFoto(foto, 420, 315)
+        elif self.nLedObjetivo <= 8:
+            self._configura_columnas()
+            # La fotos del sensor de keyence viene a 640x480
+            self._reducirFoto(foto)
             if nLed < 4:
                 self.label[nLed].grid(column=nLed-1, row=0)
             elif nLed < 7:
                 self.label[nLed].grid(column=nLed-4, row=1)
             elif nLed >= 7:
                 self.label[nLed].grid(column=nLed-7, row=2)
-    
-    def _verGeometriaLabel(self):
-        self.logger.debug(f'Tamaño label botones -> {self.frameInfo.winfo_geometry()}')
 
-    def _agregarInfo(self):
-        botton1 = ttk.Button(self.frameInfo, text="Boton1", command=self._verGeometriaLabel).grid(row=0, column=0)
-        botton2 = ttk.Button(self.frameInfo, text="Boton2").grid(row=0, column=1)
-        botton3 = ttk.Button(self.frameInfo, text="Boton3").grid(row=0, column=2)
+    def _configura_columnas(self):
+        """Configura el grid para que cada foto quede en el centro de su espacio segun su son 4 u 8 fotos"""
+        if self.nLedObjetivo <= 4:
+            for n in range(0, 2):
+                self.columnconfigure(n, weight=1)
+                self.rowconfigure(n, weight=1)
+        elif self.nLedObjetivo <= 8:
+            for n in range(0, 3):
+                self.columnconfigure(n, weight=1)
+                self.rowconfigure(n, weight=1)           
 
-    
-    def _reducirFoto(self, foto, ancho, alto):
-        logger = self.logger
+
+    def _reducirFoto(self, foto):
+        """Reduce las fotos a la altura maxima del frame, lleva una correcion que es 25 o 35 que es la altura del texto inferior"""
+        self.logger.debug(f'Reduciendo foto -> Tamaño label fotos -> {self.winfo_height()}')
+        self.logger.debug(f'Numero de led objetivo -> {self.nLedObjetivo}')
+        if self.nLedObjetivo <= 4:
+            alturaMaximaFoto = int(round(((self.winfo_height() // 2)/(480+25))*640, 0))
+        elif self.nLedObjetivo <= 8:
+            alturaMaximaFoto = int(round(((self.winfo_height() // 3)/(480+35))*640, 0))
+        alturaMaximaFoto = alturaMaximaFoto,alturaMaximaFoto
         nLed = self.manager.contador
         self.logger.debug(f'Nled ({nLed}) creando label reduciendo fotos')
         self.imagen[nLed] = Image.open(foto)
-        logger.debug(f'tamaño de la imagen {self.imagen[nLed].size}, reduciendo a {ancho}x{alto}')
-        self.imagen[nLed] = self.imagen[nLed].resize((ancho, alto))
+        self.logger.debug(f'reduciendo imagen a maximo = {alturaMaximaFoto}')
+        self.imagen[nLed].thumbnail(alturaMaximaFoto, Image.ANTIALIAS)
+        self.logger.debug(f'Medida Final = {self.imagen[nLed].size}')
         self.imagen[nLed] = ImageTk.PhotoImage(self.imagen[nLed])
-        self.label[nLed] = tk.Label(self.frameFotos, text = foto.stem, image=self.imagen[nLed], relief="raised", compound='top')
+        self.label[nLed] = tk.Label(self, text = foto.stem, image=self.imagen[nLed], relief="raised", compound='top')
     
     def borrarImagenes(self):
+        """Borra todo el grid de fotos"""
         for a in self.label:
             self.label[a].grid_forget()
         self.imagen = {}
