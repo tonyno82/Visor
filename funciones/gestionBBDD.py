@@ -113,3 +113,22 @@ class GestionBBDD:
         cursor.execute('ALTER TABLE datosInspeccion RENAME COLUMN Med_oper_L7 to Val_oper_L7')
         conn.commit()
         conn.close()
+    
+    def listadoColumnas(self):
+        """Devuelve una lista de columnas de la tabla datosInspeccion"""
+        conn = sql.connect(self.nombreBBDD)
+        cursor = conn.cursor()
+        lista = []
+        for row in cursor.execute("SELECT name FROM pragma_table_info('datosInspeccion')"):
+            lista.append(row[0])
+        conn.close()
+        return lista
+    
+    def encuentraReferencia(self, ref):
+        """Devuelve una tuppla anidada con todas las coincidencias de una referencia"""
+        conn = sql.connect(self.nombreBBDD)
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM datosInspeccion WHERE RefCompleta LIKE '%{ref}%'")
+        lista = cursor.fetchall()
+        conn.close()
+        return lista
