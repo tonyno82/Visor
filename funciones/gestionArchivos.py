@@ -14,6 +14,24 @@ class GestionArchivos:
         self.config = self.manager.config
         self.gestionModelo = self.manager.gestionModelo
         self.gestionBBDD = self.manager.gestionBBDD
+
+    def buscaArchivos(self, listaArchivos):
+        """recibe una lista y busca los archivos en la carpeta destino y devuelve una diccionario nombrelistado : pathlib.Path"""
+        cDestino = self.config.cDestino
+        diccionarioArchivosyPath= {}
+        try:
+            lista = list(filter(lambda item: Path(item), listaArchivos))
+        except Exception as e:
+            self.logger.error('error al pasar item : {listaArchivos} a Path')
+            self.logger.error(e)
+            return {}
+        for folderName, subfolders, filenames in os.walk(cDestino):
+            for filename in filenames:
+                if filename in lista:   
+                    diccionarioArchivosyPath[filename] = Path(folderName, filename)
+        return diccionarioArchivosyPath
+
+                
     
     def moverListaArchivosInpeccionados(self, listaArchivos):
         """Recibe una Lista de archivos pathlib.Path y Mueve todos a carpeta config.cDestino clasificando con BBDD"""
@@ -104,29 +122,3 @@ class GestionArchivos:
             return datetime.strptime(dia, '%b%d%Y'), escena, juicio
         else:
             raise ValueError(f'Error sacando fecha {dateString}')
-
-
-
-    """ def mueveTodoFtpToSubir(logger, cObservador):
-        for folderName, subfolders, filenames in os.walk(cObservador):
-                for filename in filenames:
-                    archivo = Path(folderName, filename)
-                    if archivo.suffix in ('.iv2p', '.jpeg', '.bmp'):
-                            logger.info(f'Moviendo Archivo {archivo}')
-                            try:
-                                dia = f"{str(archivo.name)[13:15]}-{str(archivo.name)[15:17]}-{str(archivo.name)[17:21]}"
-                                carpetaDestino = Path(cObservador, dia)
-                                if not carpetaDestino.is_dir():
-                                    logger.debug(f'creando carpeta Destino : {carpetaDestino}')
-                                    os.mkdir(carpetaDestino)
-                                if archivo.is_file():
-                                    logger.debug(f'Archivo existente, Moviendo archivo {archivo} a {carpetaDestino}')
-                                try:
-                                    shutil.move(archivo, Path(carpetaDestino, archivo.name))
-                                    logger.info(f'Archivo {archivo} Movido con exito!')
-                                except Exception as e :
-                                    logger.error(f'Error en la copia : {e}')
-                            except:
-                                logger.error(f'Imposible mover el archivo {archivo}')
-                                pass """   
-
