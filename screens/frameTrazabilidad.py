@@ -1,6 +1,7 @@
-from distutils.cmd import Command
 import tkinter as tk
 from tkinter import StringVar, ttk
+from PIL import ImageTk, Image
+from pathlib import Path
 
 class FrameTraza(tk.Frame):
     def __init__(self, manager):
@@ -12,6 +13,11 @@ class FrameTraza(tk.Frame):
         self.gestionBBDD = self.manager.gestionBBDD
         self.referenciaIntroducida = StringVar()
         self.diccionarioReferenciasBBDD = {}
+
+        self.menuPopup = tk.Menu(self.manager)
+        self.menuPopup.add_command(label='No se encontraron imagenes que mostrar', state=tk.DISABLED)
+        self.menuPopup.add_separator()
+        self.contadorItemMenu = 1
 
         self._iniciarFrames()
         self._iniciarRecogidaInformacion()
@@ -32,19 +38,48 @@ class FrameTraza(tk.Frame):
         self.scrolly.place(rely=0, x=1260, width=20, relheight=1)
         self.arbol.configure(xscrollcommand=self.scrollx.set)
         self.arbol.configure(yscrollcommand=self.scrolly.set)
-        self.arbol.bind('<3>', self._imprimeValor)
+        self.arbol.bind('<3>', self._crearMenuPopup)
         # self.arbol.bind('<<TreeviewSelect>>', self._imprimeValor)
 
-
-    def _imprimeValor(self, evento):
+    def _crearMenuPopup(self, evento):
+        self.logger.debug(evento)
+        # Limpio el menu
+        if self.contadorItemMenu > 2:
+            for numeroItem in range(2, self.contadorItemMenu):
+                self.menuPopup.delete(numeroItem, 'end')
+        self.contadorItemMenu = 1
         self.gestionArchivos = self.manager.gestionArchivos
         itemSeleccionado = self.arbol.selection()[0]
         if 'ID' in itemSeleccionado:
-            print(evento)
             listaValoresSeleccionados = self.arbol.item(itemSeleccionado)["values"]
             listaImagenes = list(filter(lambda item: '.jpeg' in str(item) or '.bmp' in str(item),listaValoresSeleccionados))
             diccionarioImagenesEncontradas = self.gestionArchivos.buscaArchivos(listaImagenes)
-            print(diccionarioImagenesEncontradas)
+        if not diccionarioImagenesEncontradas:
+            self.menuPopup.entryconfigure(0, label='No se encontraron imagenes que mostrar')
+        else:
+            for foto in diccionarioImagenesEncontradas:
+                self.contadorItemMenu += 1
+                self.rutaFotoFinal = diccionarioImagenesEncontradas[foto]
+                self.menuPopup.entryconfigure(0, label='Fotos encontradas:')
+                self.menuPopup.add_command(label=foto, command=lambda i = self.rutaFotoFinal: self._presentarFoto(i))
+                print(self.rutaFotoFinal)
+
+        self.menuPopup.post(evento.x_root, evento.y_root)
+        
+    def _presentarFoto(self, foto):
+        self.foto = foto
+        self.logger.debug(f'Sacando por pantalla {foto}')
+        self.ventanaFoto = tk.Toplevel(self.manager)
+        self.frameFoto = tk.Frame(self.ventanaFoto)
+        self.frameFoto.grid(column=0, row=0)
+        self.frameFoto.rowconfigure(0, weight=1)
+        self.frameFoto.columnconfigure(0, weight=1)
+        self.imagen = Image.open(self.foto)
+        self.imagentk = ImageTk.PhotoImage(self.imagen)
+        self.logger.debug(self.imagen.size)
+        self.laberImagen = tk.Label(self.frameFoto, text = self.foto, image=self.imagentk, compound='top')
+        self.laberImagen.pack()
+        
 
     def _buscarItem(self):
         contador = 0
