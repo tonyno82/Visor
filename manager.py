@@ -33,6 +33,7 @@ class Manager(tk.Tk):
         # Configuracion de Icono para Barra de Tareas de windows
         myappid = 'mycompany.myproduct.subproduct.version' # arbitrary string
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        self.option_add('*tearOff', False)
 
         # Configuraciones
         self.gestionModelo = config.gestionModeloQ2
@@ -152,18 +153,3 @@ class Manager(tk.Tk):
             frame.grid(column=0, row=2, columnspan=3, sticky=tk.NSEW)
             # frame.grid_propagate(False)
         self.show_frame(FrameEventos)
-    
-
-            
-
-            
-
-
-
-    
- 
-
-
-# Modo de no guardar fotos (eliminarlas) 
-# TODO : Subir a Dropbox
-
