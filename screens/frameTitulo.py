@@ -41,8 +41,4 @@ class frameTitulo(tk.Frame):
         command=lambda: self.controller.show_frame(self.controller.frameVisor))
         self.botonVisor.pack(side=tk.LEFT)  
 
-        self.botonImprimirTamano = ttk.Button(self.frameCentral, text='Tamaño',
-        command=self.controller.verGeometriaLabel)
-        self.botonImprimirTamano.pack(side=tk.LEFT)  
-
 

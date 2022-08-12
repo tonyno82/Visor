@@ -135,10 +135,6 @@ class Manager(tk.Tk):
             self.logger.error('Error al iniciar Observador')
             self.logger.error(f'Carpeta {self.config.cObservador} no encontrada')
             self.observadorOK = False
-    def verGeometriaLabel(self):
-        for F in self.frames:
-            frame = self.frames[F]
-            self.logger.debug(f'{F} -> {frame.winfo_geometry()}')
 
     def _iniciarFrames(self):
         self.frameEventos = FrameEventos
