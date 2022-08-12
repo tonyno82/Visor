@@ -19,7 +19,6 @@ class FrameEventos(tk.Frame):
         self.framePantallaLog.grid(column=0, row=1,columnspan=2)
         self.framePantallaLog.grid_propagate(False)
 
-        
         self._iniciarVariablesImportantes()
         self.pantallaLog = tk.Text(self.framePantallaLog, state='disable', width=150, height=45, wrap=None)
         self.pantallaLog.grid(column=0, row=0, sticky=tk.EW)
@@ -43,8 +42,6 @@ class FrameEventos(tk.Frame):
         separadorVariables.grid(column=0, row=0, sticky=tk.W)
         self.dicStringVar = {}
         dicLabel = {}
-        # ptueba = tk.Label(self, text="Hola Munto")
-        # ptueba.pack()
         contador = 0
         for key, value in self.infoPLC.items():
             self.dicStringVar[key] = tk.StringVar()
@@ -68,6 +65,3 @@ class FrameEventos(tk.Frame):
             else:
                 self._escribirPantalla(mensaje.getMessage())
         self.after(500, self._actualizarPantallaLog)
-
-
-# TODO : Añadir botones a la derecha para elegir el nivel de loggging, (debug-info-error...)
