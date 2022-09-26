@@ -42,7 +42,6 @@ class FrameTraza(tk.Frame):
         # self.arbol.bind('<<TreeviewSelect>>', self._imprimeValor)
 
     def _crearMenuPopup(self, evento):
-        self.logger.debug(evento)
         # Limpio el menu
         if self.contadorItemMenu > 2:
             for numeroItem in range(2, self.contadorItemMenu):
