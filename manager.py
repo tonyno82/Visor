@@ -49,7 +49,6 @@ class Manager(tk.Tk):
         # self.iconbitmap('img\Imagotipo-Rodama_ico.ico')
         self.img_logo = ImageTk.PhotoImage(Image.open(r'img\Imagotipo-Rodama_ico.ico'))
         self.iconphoto(True, self.img_logo)
-        pdb.set_trace()
         # Contador Fotos
         self.contador = 0
 
