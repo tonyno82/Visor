@@ -77,7 +77,7 @@ class Manager(tk.Tk):
 
         # Gestion Archivos
         self.gestionArchivos = GestionArchivos(self)
-        self.gestionArchivos.moverArchivosEnOrigen()
+        # self.gestionArchivos.moverArchivosEnOrigen()
         
         # Ciclo Visor
         self.gestionRegistros = GestionRegistros(self)
