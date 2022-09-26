@@ -55,6 +55,7 @@ class GestionArchivos:
         for folderName, subfolders, filenames in os.walk(cObservador):
             for filename in filenames:
                 if Path(filename).suffix in ['.jpeg', '.bmp', '.iv2p']:
+                    self.logger.info(f'Moviendo ... {filename}')
                     archivo = Path(folderName, filename)
                     self._mueveArchivosClasificados(archivo)
                     
@@ -63,6 +64,7 @@ class GestionArchivos:
 
     def _mueveArchivosClasificados(self, archivo):
         """ Recibe una ruta completa con archivo tipo pathlib.Path y mueve el archivo clasificado [config.cDestino][Fecha(2022-06-31)][Escena][OK o NG][Fotos_FOK]"""
+        pdb.set_trace()
         logger = self.logger
         cDestino = self.config.cDestino
         validacion = re.compile(r'^\d{5}_\d{3}_[NnOo][GgKk]')
