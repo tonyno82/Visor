@@ -53,11 +53,11 @@ class Manager(tk.Tk):
         self.contador = 0
 
         # Logger
-        self.colaLogger = queue.Queue(100)
+        self.colaLogger = queue.Queue(1000)
         self.logger = generadorDeLogs(self.config.ubicacionLog, self.config.nombreLog, self.colaLogger)
  
         # Observador
-        self.colaObservador = queue.Queue(100)
+        self.colaObservador = queue.Queue(1000)
         self.observadorOK = False
         self.configuracionObservador()
 

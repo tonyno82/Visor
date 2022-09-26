@@ -1,21 +1,21 @@
-# Carpeta a Observar
-cObservador = "pruebasObservador_orig"
+﻿# Carpeta a Observar
+cObservador = "D:\\FTP"
 
 # Carpeta destino archivos una vez inspecciados
-cDestino = "pruebasObservador_dest"
+cDestino = "D:\\SUBIR"
 
 # Pantalla completa ¿?
-pCompleta = False
+pCompleta = True
 
 # Tamaño de la ventana
 tPantalla = "1280x1024"
 
 # Ubicacion de archivo LOG
-ubicacionLog = '.\\log'
-nombreLog = 'Visor_log.txt'
+ubicacionLog = 'D:\\Python\\Visor\\log'
+nombreLog = 'Visor_log_Q2.txt'
 
 # Configuracion Ads Bechoff
-dirAds = '192.168.1.30.1.1'        ## Direccion
+dirAds = '5.80.247.66.1.1'        ## Direccion
 portAds = 801                     ## Puerto
-velocidadScan = 0               
+velocidadScan = 0  
 
