@@ -61,6 +61,10 @@ class Manager(tk.Tk):
         self.observadorOK = False
         self.configuracionObservador()
 
+        # Gestion Archivos
+        self.gestionArchivos = GestionArchivos(self)
+        self.gestionArchivos.moverArchivosEnOrigen()
+
         # Conexion PLC
         self.conexionPLC = ConexPLC(self)
         self.hiloPLC = threading.Thread(target=self.conexionPLC.iniciarScan)
@@ -74,10 +78,6 @@ class Manager(tk.Tk):
         # Frames
         self.frames = {}
         self._iniciarFrames()
-
-        # Gestion Archivos
-        self.gestionArchivos = GestionArchivos(self)
-        self.gestionArchivos.moverArchivosEnOrigen()
         
         # Ciclo Visor
         self.gestionRegistros = GestionRegistros(self)
