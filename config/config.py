@@ -11,7 +11,7 @@ pCompleta = True
 tPantalla = "1280x1024"
 
 # Ubicacion de archivo LOG
-ubicacionLog = 'D:\\Python\\Visor_Q2\\log'
+ubicacionLog = 'D:\\Python\\Visor\\log'
 nombreLog = 'Visor_log_Q2.txt'
 
 # Configuracion Ads Bechoff
