@@ -5,6 +5,7 @@ from watchdog.observers import Observer
 from pathlib import Path
 from PIL import ImageTk, Image
 import ctypes
+import os
 
 import config.gestionModeloQ2, config.gestionModeloCX482
 import config.config
@@ -47,6 +48,12 @@ class Manager(tk.Tk):
         # self.columnconfigure(0, weight=1)
         # self.rowconfigure(0, weight=1)
         # self.iconbitmap('img\Imagotipo-Rodama_ico.ico')
+        
+        # Cambiar ruta de ejecuacion
+        rutaArchivoEjecucion = Path(__file__).parent.absolute()
+        os.chdir(rutaArchivoEjecucion)
+        
+        
         self.img_logo = ImageTk.PhotoImage(Image.open(r'img\Imagotipo-Rodama_ico.ico'))
         self.iconphoto(True, self.img_logo)
         # Contador Fotos
