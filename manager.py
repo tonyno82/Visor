@@ -61,6 +61,11 @@ class Manager(tk.Tk):
         self.observadorOK = False
         self.configuracionObservador()
 
+        # Gestion BBDD
+        self.conexBBDD = False
+        self.gestionBBDD = GestionBBDD(self)
+        self.gestionBBDD.comprobarConexBBDD()
+
         # Gestion Archivos
         self.gestionArchivos = GestionArchivos(self)
         self.gestionArchivos.moverArchivosEnOrigen()
@@ -69,11 +74,6 @@ class Manager(tk.Tk):
         self.conexionPLC = ConexPLC(self)
         self.hiloPLC = threading.Thread(target=self.conexionPLC.iniciarScan)
         self.hiloPLC.start()
-        
-        # Gestion BBDD
-        self.conexBBDD = False
-        self.gestionBBDD = GestionBBDD(self)
-        self.gestionBBDD.comprobarConexBBDD()
 
         # Frames
         self.frames = {}
