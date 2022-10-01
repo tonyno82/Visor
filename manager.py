@@ -74,8 +74,9 @@ class Manager(tk.Tk):
         self.gestionBBDD.comprobarConexBBDD()
 
         # Gestion Archivos
-        self.gestionArchivos = GestionArchivos(self)
-        self.gestionArchivos.moverArchivosEnOrigen()
+        self.gestionArchivos = GestionArchivos(self.logger, self.config.cObservador, self.config.cDestino)
+        # Hay que hacerlo mas adelante, puede bloquear la aplicacion y inundarla de fallos desbordando la cola
+        # self.gestionArchivos.moverArchivosEnOrigen()
 
         # Conexion PLC
         self.conexionPLC = ConexPLC(self)

@@ -1,4 +1,5 @@
 from .gestionLog import generadorDeLogs
 from .gestionRegistros import GestionRegistros
+from .gestionArchivos import GestionArchivos
 
-__all__ = ["generadorDeLogs", "GestionRegistros"]
+__all__ = ["generadorDeLogs", "GestionRegistros", "GestionArchivos"]

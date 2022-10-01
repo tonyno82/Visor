@@ -7,25 +7,24 @@ import pdb
 import sqlite3
 
 class GestionArchivos:
-    """Gestiona el movimiento de archivos entre carpetas y ordenacion"""
-    def __init__(self, manager):
-        self.manager = manager
-        self.logger = self.manager.logger
-        self.config = self.manager.config
-        self.gestionModelo = self.manager.gestionModelo
-        self.gestionBBDD = self.manager.gestionBBDD
+    """Gestiona el movimiento de archivos entre carpetas carpetaOrigen y ordenacion carpetaDestino"""
+    def __init__(self, logger, carpetaOrigen, carpetaDestino):
+        self.logger = logger
+        self.cDestino = carpetaDestino
+        self.cOrigen = carpetaOrigen
 
-    def buscaArchivos(self, listaArchivos):
-        """recibe una lista y busca los archivos en la carpeta destino y devuelve una diccionario nombrelistado : pathlib.Path"""
-        cDestino = self.config.cDestino
+    def buscaArchivos(self, listaArchivos:list[str]) -> dict:
+        """recibe una lista de string ("imagen.jpeg") y busca los archivos en la carpeta destino y devuelve una diccionario nombrelistado : pathlib.Path"""
+        self.logger.debug("Buscando archivos ...")
+        self.logger.debug(listaArchivos)
         diccionarioArchivosyPath= {}
         try:
             lista = list(filter(lambda item: Path(item), listaArchivos))
         except Exception as e:
-            self.logger.error('error al pasar item : {listaArchivos} a Path')
+            self.logger.error(f'error al pasar item : {listaArchivos} a Path')
             self.logger.error(e)
             return {}
-        for folderName, subfolders, filenames in os.walk(cDestino):
+        for folderName, subfolders, filenames in os.walk(self.cDestino):
             for filename in filenames:
                 if filename in lista:   
                     diccionarioArchivosyPath[filename] = Path(folderName, filename)
@@ -33,7 +32,7 @@ class GestionArchivos:
 
                 
     
-    def moverListaArchivosInpeccionados(self, listaArchivos):
+    def moverListaArchivosInpeccionados(self, listaArchivos:list[Path]):
         """Recibe una Lista de archivos pathlib.Path y Mueve todos a carpeta config.cDestino clasificando con BBDD"""
         logger = self.logger
         for archivo in listaArchivos:
@@ -47,12 +46,10 @@ class GestionArchivos:
 
 
     def moverArchivosEnOrigen(self):
-        """Mueve todos los archivos existentes en config.cObservador con extension ['.jpeg', '.bmp', '.iv2p'] a carpeta config.cDestino clasificando con BBDD"""
-        cObservador = self.config.cObservador
-        cDestino = self.config.cDestino
+        """Mueve todos los archivos existentes en cOrigen con extension ['.jpeg', '.bmp', '.iv2p'] a carpeta cDestino clasificando con BBDD"""
         logger = self.logger
-        logger.debug(f'Moviendo archivos {cObservador} a {cDestino}  ..... ')
-        for folderName, subfolders, filenames in os.walk(cObservador):
+        logger.debug(f'Moviendo archivos {self.cOrigen} a {self.cDestino}  ..... ')
+        for folderName, subfolders, filenames in os.walk(self.cOrigen):
             for filename in filenames:
                 if Path(filename).suffix in ['.jpeg', '.bmp', '.iv2p']:
                     # self.logger.info(f'Moviendo ... {filename}')
@@ -64,8 +61,6 @@ class GestionArchivos:
 
     def _mueveArchivosClasificados(self, archivo):
         """ Recibe una ruta completa con archivo tipo pathlib.Path y mueve el archivo clasificado [config.cDestino][Fecha(2022-06-31)][Escena][OK o NG][Fotos_FOK]"""
-        logger = self.logger
-        cDestino = self.config.cDestino
         validacion = re.compile(r'^\d{5}_\d{3}_[NnOo][GgKk]')
         if not isinstance(archivo, Path) or not validacion.search(archivo.stem):
             raise ValueError(f'Archivo no valido {archivo}')
@@ -75,27 +70,28 @@ class GestionArchivos:
         try:
             fok = self.gestionBBDD.comprobarFOK(archivo.stem + '.jpeg')
         except sqlite3.OperationalError as e:
-            logger.error('Error al comprobarFOK en BBDD')
+            # self.logger.error('Error al comprobarFOK en BBDD')
             if str(e).find('Val_oper_L7'):
-                logger.warning('Detectada Val_oper_L7, Corrigiendo')
+                self.logger.warning('Detectada Val_oper_L7, Corrigiendo')
                 self.gestionBBDD.comprobarCampoErroneoCX482()
                 fok = False
             else:
-                logger.error(e)
+                pass
+                # self.logger.error(e)
         except Exception as e:
-            logger.error('Error al comprobarFOK en BBDD')
-            logger.error(e)
+            # self.logger.error('Error al comprobarFOK en BBDD')
+            # self.logger.error(e)
             fok = False
         
         if not fok:
             # logger.warning(f'Foto no encontrada en BBDD {archivo.name}')
-            destino = Path(cDestino, fecha, escena, juicio, archivo.name)
+            destino = Path(self.cDestino, fecha, escena, juicio, archivo.name)
         elif fok == 'OK':
             # logger.debug(f'Foto encontrada en BBDD')
-            destino = Path(cDestino, fecha, escena, juicio, archivo.name)
+            destino = Path(self.cDestino, fecha, escena, juicio, archivo.name)
         elif fok == 'FKO':
             # logger.debug(f'Foto encontrada en BBDD')
-            destino = Path(cDestino, fecha, escena, juicio, 'Fotos_FOK', archivo.name)
+            destino = Path(self.cDestino, fecha, escena, juicio, 'Fotos_FOK', archivo.name)
         else:
             raise ValueError(f'Error de comprobado BBDD, {archivo.name}')
         try:
@@ -103,8 +99,8 @@ class GestionArchivos:
                 os.makedirs(destino.parent)
             shutil.move(archivo, destino)
         except Exception as e:
-            logger.error(f'Error creando carpetas {destino.parent}')
-            logger.error(e)
+            self.logger.error(f'Error creando carpetas {destino.parent}')
+            self.logger.error(e)
 
         # listaImagenes = list(filter(lambda x: x.suffix in ['.jpeg', '.bmp', '.iv2p'], listaArchivo))
 
