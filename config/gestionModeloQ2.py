@@ -44,8 +44,10 @@ infoModelo = {
 # Devuelve una lista compuesa de listas de cada reguistro del PLC
 def convertirCadena(cadenas, logger, nled):
     logger.debug('Conviertiendo cadena:')
+    logger.debug(f'Cadena a gestionar : {cadenas}')
     cadenas = cadenas.split('\r')
     cadenas.pop()
+    logger.debug('cadenas despues del paso 1:')
     logger.debug(cadenas)
     listaCadena = []
     for cadena in cadenas:
