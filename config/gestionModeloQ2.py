@@ -43,9 +43,10 @@ infoModelo = {
 # inserta la referencia corta de 8 digitos despues de la fecha
 # Devuelve una lista compuesa de listas de cada reguistro del PLC
 def convertirCadena(cadenas, logger, nled):
-    logger.debug('Conviertiendo cadena')
+    logger.debug('Conviertiendo cadena:')
     cadenas = cadenas.split('\r')
     cadenas.pop()
+    logger.debug(cadenas)
     listaCadena = []
     for cadena in cadenas:
         cadena = cadena.split(';')
