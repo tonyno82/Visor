@@ -27,7 +27,7 @@ class ConexPLC:
 
         # Tiempo de espera para que una vez finalizado el scan comience el siguiente
         # En pruebas, si se pone a 0 el tiempo de ejecucion mas rapido es 45ms
-        self.tiempoScan = 0
+        self.tiempoScan = 250
         self.tiempoRealMedidoScan = 0
 
 
