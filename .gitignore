@@ -15,3 +15,4 @@ bbdd_q2.db
 pruebasObservador_dest/
 pruebasObservador_orig/
 config/config.py
+.vscode/settings.json
