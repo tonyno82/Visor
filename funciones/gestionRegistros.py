@@ -15,6 +15,7 @@ class GestionRegistros():
         self.nInspeccionesObjetivo = self.manager.conexionPLC.valoresPLC['Num_Inspecciones_Obj']
         self.logger.debug('Gestionando Registro ...')
         registro = self.manager.conexionPLC.valoresPLC['Datos_Registro']
+        self.logger.debug(f'Registro a Gestionar : {registro}')
         try:
             self.nFotosObjetivo = self.manager.gestionModelo.infoModelo[self.nInspeccionesObjetivo]['cFotoJPG']
             self.logger.debug(f"Nº de inspecciones objetivo para convertir cadena {self.nInspeccionesObjetivo}")
