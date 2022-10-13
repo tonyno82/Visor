@@ -45,8 +45,9 @@ class FrameEventos(tk.Frame):
         contador = 0
         for key, value in self.infoPLC.items():
             self.dicStringVar[key] = tk.StringVar()
-            if isinstance(value, str):
-                value = value[:50]
+            # self.valoresPLC['Datos_Registro']
+            if key == 'Datos_Registro':
+                value = str(value)[:50]
                 self.dicStringVar[key].set(value)
             else:
                 self.dicStringVar[key].set(value)
