@@ -57,7 +57,11 @@ class FrameEventos(tk.Frame):
     
     def _actualizarVariables(self):
         for key, value in self.infoPLC.items():
-            self.dicStringVar[key].set(value)
+            if key == 'Datos_Registro':
+                value = str(value)[:50]
+                self.dicStringVar[key].set(value)
+            else:
+                self.dicStringVar[key].set(value)
         self.manager.after(500, self._actualizarVariables)
 
 
