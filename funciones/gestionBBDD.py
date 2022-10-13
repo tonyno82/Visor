@@ -17,19 +17,39 @@ Created on Wed Mar  2 17:19:35 2022
 import sqlite3 as sql
 from datetime import datetime
 from pathlib import Path
+import sys
 import pdb
 import os
+
  
 class GestionBBDD:
-    def __init__(self, manager):
-        self.manager = manager
-        self.logger = self.manager.logger
-        self.gestionModelo = self.manager.gestionModelo
-        self.nombreBBDD = self.manager.gestionModelo.nombreBBDD
-        self.consultaCreacion = self.manager.gestionModelo.consultaCreacion
-        self.consultaGrabar = self.manager.gestionModelo.consultaGrabar
+    def __init__(self, gestionModelo, db_path:Path, logger):
+        self.logger = logger
+        self.gestionModelo = gestionModelo
+        self.db_path = db_path 
+        if not db_path.exists():
+            self._conectaBBDD()
+            self.logger.warning('BBDD no encontrada')
+            self.crearBBDD()
+            self.conn.close()
+        else:
+            self._conectaBBDD()
+            self.logger.info(f'BBDD encontrada !! en {self.db_path}')
+            self.conn.close()
 
-    def comprobarConexBBDD(self):
+    def crearBBDD(self):
+            self.logger.warning(f'Creando nueva BBDD en {self.db_path}')
+            try:
+                self.cursor.execute(self.gestionModelo.consultaCreacion)
+                self.conn.commit()
+                self.logger.info(f'BBDD creada con exito en {self.db_path}')
+            except Exception as e:
+                self.logger.error(f'ERROR creando BBDD en {self.db_path}')
+                self.logger.error(e)
+            finally:
+                self.conn.close()
+
+    '''def comprobarConexBBDD(self):
         self.logger.debug(f"Conectando con BBDD ({self.nombreBBDD})")
         conn = sql.connect(self.nombreBBDD)
         cursor = conn.cursor()
@@ -42,43 +62,31 @@ class GestionBBDD:
             self.manager.conexBBDD = True
             self.logger.debug('Conexion a BBDD ... OK')
         finally:
-            conn.close()
+            conn.close()'''
 
-        
+    def _conectaBBDD(self):
+        self.conn = sql.connect(self.db_path)
+        self.cursor = self.conn.cursor() 
+
 
     def comprobarFOK(self, fotoJPEG):
-        if self.manager.conexBBDD == False:
-            self.logger.error('BBDD No disponible, no se puede comprobarFOK()')
-            return False
+        '''Devuelve si una foto es OK o FOK o False si no existe'''
+        # TODO: Hacer que devuelva ok true si es FOK o false lo contrario
         resultadoFinal = []
-        conn = sql.connect(self.nombreBBDD)
-        cursor = conn.cursor()
-        infoKeyence = self.manager.gestionModelo.infoKeyence
+        infoKeyence = self.gestionModelo.infoKeyence
         # cantidad de registros que hay en cada ref, creada una lista y depues buscar el valor mas alto
         nLed = max([len(infoKeyence[ref].keys()) for ref in infoKeyence])
         for numeroled in range(1, nLed+1):
-            cursor.execute(f'select Val_oper_L{numeroled} from datosInspeccion where FotoLed{numeroled} = "{fotoJPEG}"')
-            resultado = cursor.fetchall()
+            self._conectaBBDD()
+            self.cursor.execute(f'select Val_oper_L{numeroled} from datosInspeccion where FotoLed{numeroled} = "{fotoJPEG}"')
+            resultado = self.cursor.fetchall()
             if resultado:
                 resultadoFinal = resultado[0][0]
-        conn.close()
+        self.conn.close()
         if resultadoFinal not in [0, 1]:
             return False
         return 'OK' if resultadoFinal == 0 else 'FKO'
     
-
-
-    def createDB(self):
-        conn = sql.connect(self.nombreBBDD)
-        conn.commit()
-        conn.close()
-
-    def crearTablas(self):
-        conn = sql.connect(self.nombreBBDD)
-        cursor = conn.cursor()
-        cursor.execute(self.consultaCreacion)
-        conn.commit()
-        conn.close()
 
     def insertarEnBBDD(self, registro):
         self.logger.debug(f'Cantidad de registros {len(registro)}')
@@ -100,11 +108,10 @@ class GestionBBDD:
             self.logger.error(e)
 
     def cantidadRegistros(self):
-        conn = sql.connect(self.nombreBBDD)
-        cursor = conn.cursor()
-        cursor.execute('select count(*) from datosInspeccion')
-        cantidad = cursor.fetchone()
-        conn.close()
+        self._conectaBBDD()
+        self.cursor.execute('select count(*) from datosInspeccion')
+        cantidad = self.cursor.fetchone()
+        self.conn.close()
         return cantidad[0]
     
     def comprobarCampoErroneoCX482(self):
