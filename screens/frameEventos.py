@@ -45,7 +45,11 @@ class FrameEventos(tk.Frame):
         contador = 0
         for key, value in self.infoPLC.items():
             self.dicStringVar[key] = tk.StringVar()
-            self.dicStringVar[key].set(value)
+            if isinstance(value, str):
+                value = value[:50]
+                self.dicStringVar[key].set(value)
+            else:
+                self.dicStringVar[key].set(value)
             dicLabel[key] = tk.Label(separadorVariables, text=key).grid(column=0, row=contador)
             dicLabel[key] = tk.Label(separadorVariables, textvariable=self.dicStringVar[key]).grid(column=1, row=contador)
             contador += 1
